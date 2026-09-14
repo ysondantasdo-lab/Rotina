@@ -1,80 +1,68 @@
 package br.com.ysondantas.rotina.ui
 
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import br.com.ysondantas.rotina.data.AuthFamilyRepository
 import br.com.ysondantas.rotina.data.DiaSemana
 import br.com.ysondantas.rotina.data.RotinaRepository
 
 @Composable
 fun AppNavigation(
-    authRepo: AuthFamilyRepository = AuthFamilyRepository(),
     rotinaRepo: RotinaRepository = RotinaRepository()
 ) {
     val navController = rememberNavController()
-    var logado by remember { mutableStateOf(authRepo.uidAtual != null) }
+    
+    // O ID da família agora é fixo e direto, sem precisar carregar login
+    val familyId = "familia_dantas_2026"
 
-    if (!logado) {
-        LoginScreen(authRepo) { logado = true }
-        return
-    }
+    // Guardamos o nome da criança selecionada em memória simples para as próximas telas
+    var criancaSelecionadaId by remember { mutableStateOf<String?>(null) }
+    var criancaSelecionadaNome by remember { mutableStateOf<String?>(null) }
 
-    val familyId by authRepo.familyIdFlow().collectAsState(initial = "carregando")
-
-    when (familyId) {
-        "carregando" -> Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
-        null -> VincularFamiliaScreen(authRepo) { /* a tela reabre sozinha via flow */ }
-        else -> {
-            // Guardamos o nome da criança/dia selecionados em memória simples,
-            // já que a navegação por argumentos de String cobre o essencial.
-            var criancaSelecionadaId by remember { mutableStateOf<String?>(null) }
-            var criancaSelecionadaNome by remember { mutableStateOf<String?>(null) }
-
-            NavHost(navController = navController, startDestination = "home") {
-                composable("home") {
-                    HomeScreen(familyId = familyId!!, repo = rotinaRepo) { crianca ->
-                        criancaSelecionadaId = crianca.id
-                        criancaSelecionadaNome = crianca.nome
-                        navController.navigate("semana")
-                    }
-                }
-                composable("semana") {
-                    val crianca = br.com.ysondantas.rotina.data.Crianca(
-                        id = criancaSelecionadaId ?: "", nome = criancaSelecionadaNome ?: ""
-                    )
-                    WeekScreen(
-                        crianca = crianca,
-                        aoVoltar = { navController.popBackStack() },
-                        aoAbrirDia = { dia -> navController.navigate("dia/${dia.name}") }
-                    )
-                }
-                composable(
-                    route = "dia/{diaNome}",
-                    arguments = listOf(navArgument("diaNome") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val diaNome = backStackEntry.arguments?.getString("diaNome") ?: DiaSemana.SEGUNDA.name
-                    val dia = DiaSemana.valueOf(diaNome)
-                    val crianca = br.com.ysondantas.rotina.data.Crianca(
-                        id = criancaSelecionadaId ?: "", nome = criancaSelecionadaNome ?: ""
-                    )
-                    DayScreen(
-                        familyId = familyId!!,
-                        crianca = crianca,
-                        dia = dia,
-                        repo = rotinaRepo,
-                        aoVoltar = { navController.popBackStack() }
-                    )
-                }
+    // O app inicia direto na HomeScreen (Tela Inicial)
+    NavHost(navController = navController, startDestination = "home") {
+        
+        // 1. Tela Inicial: Lista as crianças da família
+        composable("home") {
+            HomeScreen(familyId = familyId, repo = rotinaRepo) { crianca ->
+                criancaSelecionadaId = crianca.id
+                criancaSelecionadaNome = crianca.nome
+                navController.navigate("semana")
             }
+        }
+        
+        // 2. Tela dos Dias da Semana
+        composable("semana") {
+            val crianca = br.com.ysondantas.rotina.data.Crianca(
+                id = criancaSelecionadaId ?: "", nome = criancaSelecionadaNome ?: ""
+            )
+            WeekScreen(
+                crianca = crianca,
+                aoVoltar = { navController.popBackStack() },
+                aoAbrirDia = { dia -> navController.navigate("dia/${dia.name}") }
+            )
+        }
+        
+        // 3. Tela do Dia Específico (Lista os eventos e permite adicionar/excluir)
+        composable(
+            route = "dia/{diaNome}",
+            arguments = listOf(navArgument("diaNome") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val diaNome = backStackEntry.arguments?.getString("diaNome") ?: DiaSemana.SEGUNDA.name
+            val dia = DiaSemana.valueOf(diaNome)
+            val crianca = br.com.ysondantas.rotina.data.Crianca(
+                id = criancaSelecionadaId ?: "", nome = criancaSelecionadaNome ?: ""
+            )
+            DayScreen(
+                familyId = familyId,
+                crianca = crianca,
+                dia = dia,
+                repo = rotinaRepo,
+                aoVoltar = { navController.popBackStack() }
+            )
         }
     }
 }

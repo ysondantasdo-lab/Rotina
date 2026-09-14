@@ -15,8 +15,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Persistência offline: já vem ativada por padrão no Firestore,
-        // esta chamada só deixa isso explícito.
+        // Persistência offline explícita para o Firestore guardar dados sem internet
         val db = FirebaseFirestore.getInstance()
         db.firestoreSettings = db.firestoreSettings.toBuilder()
             .setLocalCacheSettings(PersistentCacheSettings.newBuilder().build())

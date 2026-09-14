@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "962330818892",
+    "project_id": "yson-rotina",
+    "storage_bucket": "yson-rotina.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962330818892:android:0577eccb2590bd0c0437e9",
+        "android_client_info": {
+          "package_name": "br.com.ysondantas.rotina"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKh5HOpiHkWRUzmi63Qq4LaI47dwy7RCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

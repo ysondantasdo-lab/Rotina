@@ -22,14 +22,15 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DayScreen(
-    familyId: String,
+    familyId: String, // Mantido apenas para não quebrar a chamada na Navigation
     crianca: Crianca,
     dia: DiaSemana,
     repo: RotinaRepository,
     aoVoltar: () -> Unit
 ) {
-    val eventos by repo.eventosFlow(familyId, crianca.id, dia.chave).collectAsState(initial = emptyList())
-    var eventoParaEditar by remember { mutableStateOf<Evento?>(null) }
+    // Corrigido para chamar o método correto do novo repositório simplificado
+    val eventos by repo.escutarEventosDoDia(crianca.id, dia.chave).collectAsState(initial = emptyList())
+    var eventoParaDeletar by remember { mutableStateOf<Evento?>(null) }
     var mostrarNovoDialogo by remember { mutableStateOf(false) }
     val escopo = rememberCoroutineScope()
 
@@ -47,7 +48,6 @@ fun DayScreen(
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
 
-            // Linha do topo: campo/botão "+" para adicionar novo evento.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -70,7 +70,7 @@ fun DayScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 6.dp)
-                                .clickable { eventoParaEditar = evento }
+                                .clickable { eventoParaDeletar = evento }
                         ) {
                             Row(
                                 Modifier.fillMaxWidth().padding(16.dp),
@@ -81,6 +81,7 @@ fun DayScreen(
                                     Text(evento.horario, style = MaterialTheme.typography.titleLarge)
                                     Text(evento.descricao, style = MaterialTheme.typography.bodyLarge)
                                 }
+                                Icon(Icons.Default.Delete, contentDescription = "Toque para excluir", tint = MaterialTheme.colorScheme.error)
                             }
                         }
                     }
@@ -96,29 +97,29 @@ fun DayScreen(
             descricaoInicial = "",
             aoConfirmar = { horario, descricao ->
                 mostrarNovoDialogo = false
-                escopo.launch { repo.adicionarEvento(familyId, crianca.id, dia.chave, horario, descricao) }
+                escopo.launch { repo.adicionarEvento(crianca.id, dia.chave, horario, descricao) }
             },
-            aoExcluir = null,
             aoCancelar = { mostrarNovoDialogo = false }
         )
     }
 
-    eventoParaEditar?.let { evento ->
-        EventoDialog(
-            titulo = "Editar evento",
-            horarioInicial = evento.horario,
-            descricaoInicial = evento.descricao,
-            aoConfirmar = { horario, descricao ->
-                eventoParaEditar = null
-                escopo.launch {
-                    repo.editarEvento(familyId, crianca.id, dia.chave, evento.id, horario, descricao)
-                }
+    eventoParaDeletar?.let { evento ->
+        AlertDialog(
+            onDismissRequest = { eventoParaDeletar = null },
+            title = { Text("Excluir Evento") },
+            text = { Text("Deseja mesmo apagar o evento '${evento.descricao}'?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val idDoc = evento.id
+                        eventoParaDeletar = null
+                        escopo.launch { repo.excluirEvento(crianca.id, dia.chave, idDoc) }
+                    }
+                ) { Text("Excluir", color = MaterialTheme.colorScheme.error) }
             },
-            aoExcluir = {
-                eventoParaEditar = null
-                escopo.launch { repo.excluirEvento(familyId, crianca.id, dia.chave, evento.id) }
-            },
-            aoCancelar = { eventoParaEditar = null }
+            dismissButton = {
+                TextButton(onClick = { eventoParaDeletar = null }) { Text("Cancelar") }
+            }
         )
     }
 }
@@ -129,7 +130,6 @@ private fun EventoDialog(
     horarioInicial: String,
     descricaoInicial: String,
     aoConfirmar: (horario: String, descricao: String) -> Unit,
-    aoExcluir: (() -> Unit)?,
     aoCancelar: () -> Unit
 ) {
     var horario by remember { mutableStateOf(horarioInicial) }
@@ -154,14 +154,6 @@ private fun EventoDialog(
                     label = { Text("Evento (ex: Escola)") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                if (aoExcluir != null) {
-                    Spacer(Modifier.height(8.dp))
-                    TextButton(onClick = aoExcluir) {
-                        Icon(Icons.Default.Delete, contentDescription = null)
-                        Spacer(Modifier.width(4.dp))
-                        Text("Excluir evento")
-                    }
-                }
             }
         },
         confirmButton = {

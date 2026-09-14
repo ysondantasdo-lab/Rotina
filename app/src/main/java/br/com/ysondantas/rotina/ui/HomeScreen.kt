@@ -18,11 +18,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    familyId: String,
+    familyId: String, // Mantido para compatibilidade com a chamada da Navigation
     repo: RotinaRepository,
     aoAbrirCrianca: (Crianca) -> Unit
 ) {
-    val criancas by repo.criancasFlow(familyId).collectAsState(initial = emptyList())
+    // Atualizado para usar a nova função em tempo real sem passar familyId
+    val criancas by repo.escutarCriancas().collectAsState(initial = emptyList())
     var mostrarDialogo by remember { mutableStateOf(false) }
     val escopo = rememberCoroutineScope()
 
@@ -57,7 +58,8 @@ fun HomeScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = 8.dp)
+                                .clickable { aoAbrirCrianca(crianca) } // Mover o clique para o Card inteiro melhora o toque
                         ) {
                             Text(
                                 crianca.nome,
@@ -65,7 +67,6 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .padding(20.dp)
                                     .fillMaxWidth()
-                                    .clickable { aoAbrirCrianca(crianca) }
                             )
                         }
                     }
@@ -79,7 +80,7 @@ fun HomeScreen(
             aoConfirmar = { nome ->
                 mostrarDialogo = false
                 if (nome.isNotBlank()) {
-                    escopo.launch { repo.adicionarCrianca(familyId, nome) }
+                    escopo.launch { repo.adicionarCrianca(nome) }
                 }
             },
             aoCancelar = { mostrarDialogo = false }
@@ -94,7 +95,12 @@ private fun AdicionarCriancaDialog(aoConfirmar: (String) -> Unit, aoCancelar: ()
         onDismissRequest = aoCancelar,
         title = { Text("Nome da criança") },
         text = {
-            OutlinedTextField(value = nome, onValueChange = { nome = it }, singleLine = true)
+            OutlinedTextField(
+                value = nome, 
+                onValueChange = { nome = it }, 
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
         },
         confirmButton = {
             TextButton(onClick = { aoConfirmar(nome) }) { Text("Adicionar") }
