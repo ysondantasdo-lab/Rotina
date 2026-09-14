@@ -7,11 +7,9 @@ app/src/main/java/br/com/ysondantas/rotina
 ├── MainActivity.kt
 ├── data/
 │   ├── Modelos.kt              (Crianca, Evento, DiaSemana)
-│   ├── AuthFamilyRepository.kt (login + vínculo entre os dois pais)
 │   └── RotinaRepository.kt     (crianças, dias, eventos em tempo real)
 └── ui/
     ├── theme/Theme.kt          (fontes grandes, alto contraste)
-    ├── LoginScreen.kt          (login/cadastro + criar ou entrar em família)
     ├── HomeScreen.kt           (Tela inicial)
     ├── WeekScreen.kt           (Tela Semana)
     ├── DayScreen.kt            (Tela Dia)
@@ -27,12 +25,10 @@ seu projeto Android Studio (ajuste o nome do pacote se usar outro).
 2. Adicione um app Android informando o **applicationId** do seu projeto
    (ex: `com.example.rotinacriancas`).
 3. Baixe o `google-services.json` e coloque em `app/`.
-4. Em **Authentication → Sign-in method**, ative **E-mail/senha**.
-5. Em **Firestore Database**, crie o banco (modo produção).
+4. Em **Firestore Database**, crie o banco (modo produção).
 
-> Assumi login por e-mail/senha por ser o mais simples de configurar (sem
-> precisar de OAuth do Google Cloud). Se preferir "Entrar com Google", me
-> avise que eu adapto o `AuthFamilyRepository`.
+> O fluxo atual não usa senha nem tela de login. Configure a autenticação
+> anônima no Firebase caso as regras do Firestore exijam um usuário autenticado.
 
 ## 2. Dependências (Gradle)
 
