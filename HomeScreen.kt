@@ -1,4 +1,4 @@
-package com.example.rotinacriancas.ui
+package br.com.ysondantas.rotina.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,8 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rotinacriancas.data.Crianca
-import com.example.rotinacriancas.data.RotinaRepository
+import br.com.ysondantas.rotina.data.Crianca
+import br.com.ysondantas.rotina.data.RotinaRepository
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -1,4 +1,4 @@
-package com.example.rotinacriancas.ui.theme
+package br.com.ysondantas.rotina.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography

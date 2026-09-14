@@ -1,4 +1,4 @@
-package com.example.rotinacriancas.ui
+package br.com.ysondantas.rotina.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,8 +10,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rotinacriancas.data.Crianca
-import com.example.rotinacriancas.data.DiaSemana
+import br.com.ysondantas.rotina.data.Crianca
+import br.com.ysondantas.rotina.data.DiaSemana
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

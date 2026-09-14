@@ -1,4 +1,4 @@
-package com.example.rotinacriancas.data
+package br.com.ysondantas.rotina.data
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query

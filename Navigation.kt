@@ -1,4 +1,4 @@
-package com.example.rotinacriancas.ui
+package br.com.ysondantas.rotina.ui
 
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
@@ -11,9 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.rotinacriancas.data.AuthFamilyRepository
-import com.example.rotinacriancas.data.DiaSemana
-import com.example.rotinacriancas.data.RotinaRepository
+import br.com.ysondantas.rotina.data.AuthFamilyRepository
+import br.com.ysondantas.rotina.data.DiaSemana
+import br.com.ysondantas.rotina.data.RotinaRepository
 
 @Composable
 fun AppNavigation(
@@ -48,7 +48,7 @@ fun AppNavigation(
                     }
                 }
                 composable("semana") {
-                    val crianca = com.example.rotinacriancas.data.Crianca(
+                    val crianca = br.com.ysondantas.rotina.data.Crianca(
                         id = criancaSelecionadaId ?: "", nome = criancaSelecionadaNome ?: ""
                     )
                     WeekScreen(
@@ -63,7 +63,7 @@ fun AppNavigation(
                 ) { backStackEntry ->
                     val diaNome = backStackEntry.arguments?.getString("diaNome") ?: DiaSemana.SEGUNDA.name
                     val dia = DiaSemana.valueOf(diaNome)
-                    val crianca = com.example.rotinacriancas.data.Crianca(
+                    val crianca = br.com.ysondantas.rotina.data.Crianca(
                         id = criancaSelecionadaId ?: "", nome = criancaSelecionadaNome ?: ""
                     )
                     DayScreen(

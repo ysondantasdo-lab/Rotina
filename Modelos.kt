@@ -1,4 +1,4 @@
-package com.example.rotinacriancas.data
+package br.com.ysondantas.rotina.data
 
 data class Crianca(
     val id: String = "",

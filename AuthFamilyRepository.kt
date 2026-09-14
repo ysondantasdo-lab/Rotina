@@ -1,4 +1,4 @@
-package com.example.rotinacriancas.data
+package br.com.ysondantas.rotina
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

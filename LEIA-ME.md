@@ -3,7 +3,7 @@
 ## Estrutura de arquivos entregues
 
 ```
-app/src/main/java/com/example/rotinacriancas/
+app/src/main/java/br/com/ysondantas/rotina
 ├── MainActivity.kt
 ├── data/
 │   ├── Modelos.kt              (Crianca, Evento, DiaSemana)
