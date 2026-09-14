@@ -1,0 +1,174 @@
+package com.example.rotinacriancas.ui
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.rotinacriancas.data.Crianca
+import com.example.rotinacriancas.data.DiaSemana
+import com.example.rotinacriancas.data.Evento
+import com.example.rotinacriancas.data.RotinaRepository
+import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DayScreen(
+    familyId: String,
+    crianca: Crianca,
+    dia: DiaSemana,
+    repo: RotinaRepository,
+    aoVoltar: () -> Unit
+) {
+    val eventos by repo.eventosFlow(familyId, crianca.id, dia.chave).collectAsState(initial = emptyList())
+    var eventoParaEditar by remember { mutableStateOf<Evento?>(null) }
+    var mostrarNovoDialogo by remember { mutableStateOf(false) }
+    val escopo = rememberCoroutineScope()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("${crianca.nome} · ${dia.label}") },
+                navigationIcon = {
+                    IconButton(onClick = aoVoltar) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
+
+            // Linha do topo: campo/botão "+" para adicionar novo evento.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Rotina do dia", style = MaterialTheme.typography.titleLarge)
+                FilledIconButton(onClick = { mostrarNovoDialogo = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "Adicionar evento")
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            if (eventos.isEmpty()) {
+                Text("Nenhum evento cadastrado ainda", style = MaterialTheme.typography.bodyLarge)
+            } else {
+                LazyColumn {
+                    items(eventos, key = { it.id }) { evento ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
+                                .clickable { eventoParaEditar = evento }
+                        ) {
+                            Row(
+                                Modifier.fillMaxWidth().padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(evento.horario, style = MaterialTheme.typography.titleLarge)
+                                    Text(evento.descricao, style = MaterialTheme.typography.bodyLarge)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (mostrarNovoDialogo) {
+        EventoDialog(
+            titulo = "Novo evento",
+            horarioInicial = "",
+            descricaoInicial = "",
+            aoConfirmar = { horario, descricao ->
+                mostrarNovoDialogo = false
+                escopo.launch { repo.adicionarEvento(familyId, crianca.id, dia.chave, horario, descricao) }
+            },
+            aoExcluir = null,
+            aoCancelar = { mostrarNovoDialogo = false }
+        )
+    }
+
+    eventoParaEditar?.let { evento ->
+        EventoDialog(
+            titulo = "Editar evento",
+            horarioInicial = evento.horario,
+            descricaoInicial = evento.descricao,
+            aoConfirmar = { horario, descricao ->
+                eventoParaEditar = null
+                escopo.launch {
+                    repo.editarEvento(familyId, crianca.id, dia.chave, evento.id, horario, descricao)
+                }
+            },
+            aoExcluir = {
+                eventoParaEditar = null
+                escopo.launch { repo.excluirEvento(familyId, crianca.id, dia.chave, evento.id) }
+            },
+            aoCancelar = { eventoParaEditar = null }
+        )
+    }
+}
+
+@Composable
+private fun EventoDialog(
+    titulo: String,
+    horarioInicial: String,
+    descricaoInicial: String,
+    aoConfirmar: (horario: String, descricao: String) -> Unit,
+    aoExcluir: (() -> Unit)?,
+    aoCancelar: () -> Unit
+) {
+    var horario by remember { mutableStateOf(horarioInicial) }
+    var descricao by remember { mutableStateOf(descricaoInicial) }
+
+    AlertDialog(
+        onDismissRequest = aoCancelar,
+        title = { Text(titulo) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = horario,
+                    onValueChange = { horario = it },
+                    label = { Text("Horário (ex: 07:30)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = descricao,
+                    onValueChange = { descricao = it },
+                    label = { Text("Evento (ex: Escola)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (aoExcluir != null) {
+                    Spacer(Modifier.height(8.dp))
+                    TextButton(onClick = aoExcluir) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Spacer(Modifier.width(4.dp))
+                        Text("Excluir evento")
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { aoConfirmar(horario, descricao) }) { Text("Salvar") }
+        },
+        dismissButton = {
+            TextButton(onClick = aoCancelar) { Text("Cancelar") }
+        }
+    )
+}
