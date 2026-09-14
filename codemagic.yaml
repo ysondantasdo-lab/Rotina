@@ -1,0 +1,22 @@
+workflows:
+  android-kotlin-workflow:
+    name: Compilar Aplicativo Rotina
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      groups:
+        - keystore_credentials # Vamos criar esse grupo no painel do Codemagic logo em seguida
+      vars:
+        PACKAGE_NAME: "br.com.ysondantas.rotina"
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+    scripts:
+      - name: Build Android App Bundle (AAB)
+        script: |
+          ./gradlew bundleRelease
+    artifacts:
+      - app/build/outputs/bundle/release/*.aab
