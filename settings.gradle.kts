@@ -13,5 +13,12 @@ dependencyResolutionManagement {
     }
 }
 
+// 📦 Fornece as versões corretas para o arquivo que você acabou de configurar
+plugins {
+    id("com.android.application") version "8.8.0" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.20" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.20" apply false
+}
+
 rootProject.name = "Rotina"
 include(":app")
