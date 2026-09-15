@@ -6,7 +6,7 @@ workflows:
     environment:
       java: 17
       android_signing:
-        - rotina_keystore
+        - rotina-chave
       groups:
         - keystore_credentials # Vamos criar esse grupo no painel do Codemagic logo em seguida
       vars:
