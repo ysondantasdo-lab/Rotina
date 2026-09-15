@@ -5,12 +5,13 @@ workflows:
     instance_type: mac_mini_m1
     environment:
       java: 17
-      android_signing:
-        - rotina-chave
+      
       groups:
         - keystore_credentials # Vamos criar esse grupo no painel do Codemagic logo em seguida
       vars:
         PACKAGE_NAME: "br.com.ysondantas.rotina"
+      android_signing:
+        - rotina-chave
     triggering:
       events:
         - push
@@ -18,6 +19,9 @@ workflows:
         - pattern: 'main'
           include: true
     scripts:
+      - name: Dar permissao ao Gradle
+        script: |
+          chmod +x gradlew
       - name: Build Android App Bundle (AAB)
         script: |
           ./gradlew bundleRelease
