@@ -6,3 +6,10 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Local Android SDK path
+local.properties
+
+# Android release signing key
+*.jks
+*.keystore
