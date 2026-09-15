@@ -5,11 +5,11 @@ plugins {
 
 
 android {
-    namespace = "com.ysondantas.rotina" // Identificador único do seu app
+    namespace = "br.com.ysondantas.rotina" // Identificador único do seu app
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ysondantas.rotina"
+        applicationId = "br.com.ysondantas.rotina"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
