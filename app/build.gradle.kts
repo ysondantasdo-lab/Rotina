@@ -1,5 +1,3 @@
-compileSdk = 36
-
 // app/build.gradle.kts (Dentro da pasta app)
 plugins {
     id("com.android.application")
@@ -10,8 +8,7 @@ plugins {
 
 android {
     namespace = "br.com.ysondantas.rotina"
-    compileSdk = 35
-
+    compileSdk = 36
     val keystorePath = System.getenv("CM_KEYSTORE_PATH")
     val keystorePassword = System.getenv("CM_KEYSTORE_PASSWORD")
     val keyAlias = System.getenv("CM_KEY_ALIAS")
