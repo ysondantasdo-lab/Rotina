@@ -1,3 +1,5 @@
+compileSdk = 36
+
 // app/build.gradle.kts (Dentro da pasta app)
 plugins {
     id("com.android.application")
@@ -29,9 +31,9 @@ android {
     defaultConfig {
         applicationId = "br.com.ysondantas.rotina"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        targetSdk = 36
+        versionCode = 4
+        versionName = "1.3"
     }
 
     buildFeatures {
