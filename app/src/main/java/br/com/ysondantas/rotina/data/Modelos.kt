@@ -7,8 +7,10 @@ data class Crianca(
 
 data class Evento(
     val id: String = "",
-    val horario: String = "",   // formato "HH:mm", ex: "07:30"
-    val descricao: String = ""  // ex: "Escola", "Natação", "Dormir"
+    val horario: String = "",              // formato "HH:mm", ex: "07:30"
+    val descricao: String = "",            // ex: "Escola", "Natação", "Dormir"
+    val grupoId: String = "",              // identifica o conjunto de eventos repetidos (mesmo evento em vários dias)
+    val diasRepeticao: List<String> = emptyList() // chaves (DiaSemana.chave) dos dias em que esse grupo aparece
 )
 
 /**
