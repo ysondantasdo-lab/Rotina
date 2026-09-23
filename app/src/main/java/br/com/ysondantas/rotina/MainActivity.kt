@@ -22,6 +22,23 @@ class MainActivity : ComponentActivity() {
             .setLocalCacheSettings(PersistentCacheSettings.newBuilder().build())
             .build()
 
+        // 2. Inicializa o Firebase Auth e faz o login anônimo em segundo plano
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null) {
+            auth.signInAnonymously()
+                .addOnSuccessListener { authResult ->
+                    Log.d("Firebase", "Login anônimo efetuado! UID: ${authResult.user?.uid}")
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Falha ao realizar login anônimo", exception)
+                }
+        } else {
+            Log.d("Firebase", "Usuário já autenticado: ${auth.currentUser?.uid}")
+        }
+
+
+
+            
         setContent {
             RotinaCriancasTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
